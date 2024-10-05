@@ -6,14 +6,26 @@ import pkgjson from "body-parser";
 const { json } = pkgjson; // Import body-parser
 const { Client } = pkg;
 
+import fs from "fs";
+
+// Load SSL certificates
+const serverOptions = {
+  key: fs.readFileSync("path/to/your/private.key"),
+  cert: fs.readFileSync("path/to/your/certificate.crt"),
+};
+
 const app = express();
 const PORT = 3000;
 
 // Middleware to parse JSON requests
 app.use(express.json());
 
-// Create a WebSocket server
-const wss = new WebSocketServer({ port: 443 });
+// Create an HTTPS server
+const httpsServer = createServer(serverOptions, app);
+
+// Create a WebSocket server using the HTTPS server
+const wss = new WebSocketServer({ server: httpsServer });
+
 
 // PostgreSQL client setup
 const pgClient = new Client({

@@ -35,6 +35,9 @@ pgClient
 wss.on("connection", (ws) => {
   console.log("New client connected");
 
+  ws.on("error", (error) => {
+    console.error("WebSocket error:", error);
+  });
   ws.on("close", () => {
     console.log("Client disconnected");
   });

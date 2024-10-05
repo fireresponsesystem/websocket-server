@@ -13,7 +13,7 @@ const PORT = 3000;
 app.use(express.json());
 
 // Create a WebSocket server
-const wss = new WebSocketServer({ port: PORT });
+const wss = new WebSocketServer({ port: 8080 });
 
 // PostgreSQL client setup
 const pgClient = new Client({

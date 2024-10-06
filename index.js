@@ -40,6 +40,6 @@ app.post("/notify", (req, res) => {
     res.status(500).send("Failed to send notification");
   }
 });
-app.listen(PORT, () => {
+server.listen(PORT, () => {
   console.log(`WebSocket server running on port ${PORT}`);
 });

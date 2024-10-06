@@ -3,12 +3,13 @@ import { WebSocketServer } from "ws";
 import bodyParser from "body-parser";
 
 const app = express();
-const PORT = 3002;
+const PORT = 80;
+const WS_PORT = 8080;
 
 // Middleware to parse JSON requests
 app.use(bodyParser.json());
 
-const wss = new WebSocketServer({ port: 80 });
+const wss = new WebSocketServer({ port: WS_PORT });
 
 // Handle incoming WebSocket connections
 wss.on("connection", (ws) => {

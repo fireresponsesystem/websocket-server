@@ -4,7 +4,7 @@ import bodyParser from "body-parser";
 
 const app = express();
 const PORT = 8080;
-const WS_PORT = 80;
+const WS_PORT = 443;
 
 // Middleware to parse JSON requests
 app.use(bodyParser.json());

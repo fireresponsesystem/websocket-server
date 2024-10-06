@@ -1,12 +1,11 @@
 {
   "name": "websocket-server",
   "version": "1.0.0",
-  "main": "server.js",
+  "main": "index.js",
   "type": "module",
   "scripts": {
-    "start:rest": "node server.js",
-    "start:ws": "node ws-server.js",
-    "start": "concurrently \"npm run start:rest\" \"npm run start:ws\""
+    "start": "node index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
   "author": "",
@@ -20,7 +19,6 @@
     "dotenv": "^16.4.5",
     "express": "^4.21.0",
     "pg": "^8.13.0",
-    "pm2": "^5.4.2",
     "ws": "^8.18.0"
   }
 }

@@ -5,8 +5,7 @@ import fs from "fs";
 import https from "https";
 
 const app = express();
-const PORT = 443;
-
+const HTTP_PORT = 3002; // Change to 8080 for WebSocket server if needed
 // Load your SSL certificate and key
 const serverOptions = {
   key: fs.readFileSync("./private.key"),
@@ -22,6 +21,10 @@ const wss = new WebSocketServer({ server });
 // Handle incoming WebSocket connections
 wss.on("connection", (ws) => {
   console.log("New client connected");
+});
+
+wss.on("error", (error) => {
+  console.error("WebSocket error:", error);
 });
 
 // HTTP endpoint for notifications
@@ -40,6 +43,10 @@ app.post("/notify", (req, res) => {
     res.status(500).send("Failed to send notification");
   }
 });
-server.listen(PORT, () => {
-  console.log(`WebSocket server running on port ${PORT}`);
-});
+server
+  .listen(HTTP_PORT, () => {
+    console.log(`WebSocket server running on port ${HTTP_PORT}`);
+  })
+  .on("error", (err) => {
+    console.error("Server error:", err);
+  });

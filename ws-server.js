@@ -1,10 +1,10 @@
 // WebSocket Server (ws-server.js)
 import { WebSocketServer } from "ws";
 
-const PORT = 8080; // WebSocket server port
+const PORT = 80; // WebSocket server port
 
 // Create a WebSocket server
-const wss = new WebSocketServer({ port: 8080 });
+const wss = new WebSocketServer({ port: PORT });
 
 // Handle incoming WebSocket connections
 wss.on("connection", (ws) => {

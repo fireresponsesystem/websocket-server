@@ -4,8 +4,9 @@
   "main": "server.js",
   "type": "module",
   "scripts": {
-    "start": "node server.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start:rest": "node server.js",
+    "start:ws": "node ws-server.js",
+    "start": "concurrently \"npm run start:rest\" \"npm run start:ws\""
   },
   "keywords": [],
   "author": "",
@@ -15,6 +16,7 @@
     "node": ">=16.x"
   },
   "dependencies": {
+    "concurrently": "^9.0.1",
     "dotenv": "^16.4.5",
     "express": "^4.21.0",
     "pg": "^8.13.0",

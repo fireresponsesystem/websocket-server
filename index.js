@@ -1,16 +1,23 @@
 import express from "express";
 import { WebSocketServer } from "ws";
 import bodyParser from "body-parser";
+import fs from "fs";
 
 const app = express();
-const PORT = 3002;
-const WS_PORT = 443;
+const PORT = 443;
+
+// Load your SSL certificate and key
+const serverOptions = {
+  key: fs.readFileSync("./private.key"),
+  cert: fs.readFileSync("./certificate.crt"),
+};
 
 // Middleware to parse JSON requests
 app.use(bodyParser.json());
 
-const wss = new WebSocketServer({ port: WS_PORT });
+const server = https.createServer(serverOptions, app);
 
+const wss = new WebSocketServer({ server });
 // Handle incoming WebSocket connections
 wss.on("connection", (ws) => {
   console.log("New client connected");

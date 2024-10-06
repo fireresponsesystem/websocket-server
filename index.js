@@ -1,6 +1,6 @@
 import { WebSocketServer } from "ws";
 
-const PORT = 3002; // Define the WebSocket server port
+const PORT = 443; // Define the WebSocket server port
 const wss = new WebSocketServer({ port: PORT }); // Create WebSocket server
 
 // Handle incoming WebSocket connections

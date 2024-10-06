@@ -15,17 +15,22 @@ wss.on("connection", (ws) => {
   console.log("New client connected");
 });
 
-// Notification endpoint
+// HTTP endpoint for notifications
 app.post("/notify", (req, res) => {
   const { message } = req.body;
-  wss.clients.forEach((client) => {
-    if (client.readyState === client.OPEN) {
-      client.send(message);
-    }
-  });
-  res.status(200).send("Notification sent");
+  console.log("Received notification:", message); // Log received message
+  try {
+    wss.clients.forEach((client) => {
+      if (client.readyState === client.OPEN) {
+        client.send(message);
+      }
+    });
+    res.status(200).send("Notification sent");
+  } catch (error) {
+    console.error("Error sending notification:", error);
+    res.status(500).send("Failed to send notification");
+  }
 });
-
 app.listen(PORT, () => {
   console.log(`WebSocket server running on port ${PORT}`);
 });

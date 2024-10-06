@@ -1,31 +1,14 @@
 import express from "express";
-import { WebSocketServer } from "ws";
 import pkg from "pg";
-import pkgjson from "body-parser";
-
-const { json } = pkgjson; // Import body-parser
 const { Client } = pkg;
 
-import fs from "fs";
-
-// Load SSL certificates
-const serverOptions = {
-  key: fs.readFileSync("path/to/your/private.key"),
-  cert: fs.readFileSync("path/to/your/certificate.crt"),
-};
+import { notifyClients } from "./ws-server.js"; // Import the WebSocket notification function
 
 const app = express();
-const PORT = 3000;
+const PORT = 3001;
 
 // Middleware to parse JSON requests
 app.use(express.json());
-
-// Create an HTTPS server
-const httpsServer = createServer(serverOptions, app);
-
-// Create a WebSocket server using the HTTPS server
-const wss = new WebSocketServer({ server: httpsServer });
-
 
 // PostgreSQL client setup
 const pgClient = new Client({
@@ -43,37 +26,21 @@ pgClient
     console.error("Error connecting to PostgreSQL:", err);
   });
 
-// Handle incoming WebSocket connections
-wss.on("connection", (ws) => {
-  console.log("New client connected");
-
-  ws.on("error", (error) => {
-    console.error("WebSocket error:", error);
-  });
-  ws.on("close", () => {
-    console.log("Client disconnected");
-  });
-});
-
 // Express endpoint to add an incident
 app.post("/api/sms", async (req, res) => {
-  const data = req.body; // Get the data from the request body
-
-  // Extract house_no and ensure it's a string
+  const data = req.body;
   const house_no = String(data.house_no);
 
   try {
-    // Fetch account information based on the house number (use parameterized query)
     const result = await pgClient.query(
       `SELECT coordinates, owner FROM accounts WHERE house_no = $1`,
       [house_no]
     );
 
-    // Check if any account was found
     if (result.rows.length === 0) {
-      return res.status(400).json({
-        message: `There is no existing account with house id ${house_no}`,
-      });
+      return res
+        .status(400)
+        .json({ message: `No account found for house number ${house_no}` });
     }
 
     const { coordinates, owner } = result.rows[0];
@@ -87,20 +54,16 @@ app.post("/api/sms", async (req, res) => {
       [house_no, owner, coordinates, image_url]
     );
 
-    // Insert data into the notifications table
+    // Insert into reports table
     await pgClient.query(
       `INSERT INTO reports (house_no, owner, coordinates, image_url, date_and_time_recorded) 
-         VALUES ($1, $2, $3, $4, NOW())`,
+       VALUES ($1, $2, $3, $4, NOW())`,
       [house_no, owner, coordinates, image_url]
     );
 
-    // Notify all connected WebSocket clients after successful insertion
+    // Notify WebSocket clients
     const message = JSON.stringify({ house_no, coordinates, owner, image_url });
-    wss.clients.forEach((client) => {
-      if (client.readyState === client.OPEN) {
-        client.send(message);
-      }
-    });
+    notifyClients(message); // Notify WebSocket clients using the imported function
 
     res.status(200).json({ message: "Data inserted successfully" });
   } catch (error) {
@@ -111,5 +74,5 @@ app.post("/api/sms", async (req, res) => {
 
 // Start the Express server
 app.listen(PORT, () => {
-  console.log(`Express server running on port ${PORT}`);
+  console.log(`REST API server running on port ${PORT}`);
 });
